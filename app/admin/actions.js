@@ -111,3 +111,55 @@ export async function createProduct(formData) {
 
   redirect(`/admin?success=${encodeURIComponent("Produk berhasil ditambahkan.")}`);
 }
+
+export async function updateProduct(formData) {
+  const id = formData.get("id")?.toString().trim() ?? "";
+  const nama = formData.get("nama")?.toString().trim() ?? "";
+  const hargaInput = formData.get("harga")?.toString().trim() ?? "";
+  const harga = Number(hargaInput);
+  const kategori = formData.get("kategori")?.toString().trim() || null;
+  const fotoUrl = formData.get("foto_url")?.toString().trim() || null;
+  const deskripsi = formData.get("deskripsi")?.toString().trim() || null;
+  const halamanEdit = `/admin/produk/${encodeURIComponent(id)}/ubah`;
+
+  if (!id) {
+    redirect(`/admin?error=${encodeURIComponent("Produk yang akan diubah tidak ditemukan.")}`);
+  }
+
+  if (!nama) {
+    redirect(`${halamanEdit}?error=${encodeURIComponent("Nama produk wajib diisi.")}`);
+  }
+
+  if (!hargaInput || !Number.isSafeInteger(harga) || harga < 0) {
+    redirect(
+      `${halamanEdit}?error=${encodeURIComponent("Harga harus berupa bilangan bulat 0 atau lebih.")}`,
+    );
+  }
+
+  const supabase = await createServerAuthClient();
+  const { data, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !data.user) {
+    redirect(
+      `/admin/login?error=${encodeURIComponent("Sesi login tidak ditemukan. Silakan masuk kembali.")}`,
+    );
+  }
+
+  const { data: produk, error } = await supabase
+    .from("produk")
+    .update({ nama, harga, deskripsi, foto_url: fotoUrl, kategori })
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    console.error("Gagal mengubah produk:", error);
+    redirect(`${halamanEdit}?error=${encodeURIComponent("Produk gagal diperbarui. Periksa data lalu coba lagi.")}`);
+  }
+
+  if (!produk) {
+    redirect(`/admin?error=${encodeURIComponent("Produk yang akan diubah tidak ditemukan.")}`);
+  }
+
+  redirect(`/admin?success=${encodeURIComponent("Produk berhasil diperbarui.")}`);
+}

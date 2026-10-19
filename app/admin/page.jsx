@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function HalamanAdmin({ searchParams }) {
   const params = await searchParams;
   const pesanBerhasil = params?.success;
+  const pesanAksiError = params?.error;
   const supabase = await createServerAuthClient();
   const {
     data: { user },
@@ -42,6 +43,11 @@ export default async function HalamanAdmin({ searchParams }) {
       {pesanBerhasil ? (
         <p role="status" className="rounded-lg border border-utama/30 bg-utama/10 px-3 py-2 text-sm text-utama">
           {pesanBerhasil}
+        </p>
+      ) : null}
+      {pesanAksiError ? (
+        <p role="alert" className="rounded-lg border border-bahaya/30 bg-bahaya/10 px-3 py-2 text-sm text-bahaya">
+          {pesanAksiError}
         </p>
       ) : null}
       {pesanError ? (
