@@ -163,3 +163,39 @@ export async function updateProduct(formData) {
 
   redirect(`/admin?success=${encodeURIComponent("Produk berhasil diperbarui.")}`);
 }
+
+export async function deleteProduct(formData) {
+  const id = formData.get("id")?.toString().trim() ?? "";
+  const idNumber = Number(id);
+
+  if (!id || !Number.isSafeInteger(idNumber) || idNumber <= 0) {
+    redirect(`/admin?error=${encodeURIComponent("ID produk tidak valid.")}`);
+  }
+
+  const supabase = await createServerAuthClient();
+  const { data, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !data.user) {
+    redirect(
+      `/admin/login?error=${encodeURIComponent("Sesi login tidak ditemukan. Silakan masuk kembali.")}`,
+    );
+  }
+
+  const { data: produk, error } = await supabase
+    .from("produk")
+    .delete()
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    console.error("Gagal menghapus produk:", error);
+    redirect(`/admin?error=${encodeURIComponent("Produk gagal dihapus. Silakan coba lagi.")}`);
+  }
+
+  if (!produk) {
+    redirect(`/admin?error=${encodeURIComponent("Produk yang akan dihapus tidak ditemukan.")}`);
+  }
+
+  redirect(`/admin?success=${encodeURIComponent("Produk berhasil dihapus.")}`);
+}
