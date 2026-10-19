@@ -1,11 +1,33 @@
 import NavAdmin from "@/components/NavAdmin";
 import TabelProduk from "@/components/TabelProduk";
 import Tombol from "@/components/Tombol";
-import { produkContoh } from "@/lib/data-contoh";
+import { redirect } from "next/navigation";
+import { createServerAuthClient } from "@/lib/supabase/server";
 
-export default function HalamanAdmin() {
-  // US-07 (bonus): daftar produk masih memakai data contoh, belum dari database.
-  const daftarProduk = produkContoh;
+export const dynamic = "force-dynamic";
+
+export default async function HalamanAdmin() {
+  const supabase = await createServerAuthClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    redirect("/admin/login");
+  }
+
+  const { data, error } = await supabase
+    .from("produk")
+    .select("id, nama, harga, deskripsi, foto_url, kategori, created_at")
+    .order("created_at", { ascending: false });
+
+  const daftarProduk = data ?? [];
+  const pesanError = error ? "Daftar produk tidak dapat dimuat. Silakan coba lagi nanti." : "";
+
+  if (error) {
+    console.error("Gagal mengambil daftar produk admin:", error);
+  }
 
   return (
     <div className="flex flex-col gap-6 py-8">
@@ -15,7 +37,17 @@ export default function HalamanAdmin() {
         {/* US-08 (bonus): tambah produk */}
         <Tombol href="/admin/produk/baru">Tambah produk</Tombol>
       </div>
-      <TabelProduk daftarProduk={daftarProduk} />
+      {pesanError ? (
+        <p role="alert" className="rounded-lg border border-bahaya/30 bg-bahaya/10 px-3 py-2 text-bahaya">
+          {pesanError}
+        </p>
+      ) : daftarProduk.length === 0 ? (
+        <p className="rounded-lg border border-garis bg-permukaan px-3 py-2 text-teks-lembut">
+          Belum ada produk.
+        </p>
+      ) : (
+        <TabelProduk daftarProduk={daftarProduk} />
+      )}
     </div>
   );
 }
