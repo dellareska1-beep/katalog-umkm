@@ -277,13 +277,13 @@ export async function generateProductDescription(formData) {
     };
   }
 
-  const model = (process.env.GEMINI_MODEL || "gemini-2.5-flash")
+  const model = (process.env.GEMINI_MODEL || "gemini-3.5-flash")
     .trim()
     .replace(/^models\//, "");
 
   if (!model || model.includes("/")) {
     return {
-      error: "GEMINI_MODEL tidak valid. Gunakan nama model seperti gemini-2.5-flash.",
+      error: "GEMINI_MODEL tidak valid. Gunakan nama model seperti gemini-3.5-flash.",
     };
   }
   const prompt = [
@@ -333,11 +333,14 @@ export async function generateProductDescription(formData) {
     }
 
     const hasil = await response.json();
-    const deskripsi = hasil.candidates?.[0]?.content?.parts
-      ?.map((part) => part.text)
-      .filter(Boolean)
-      .join(" ")
-      .trim();
+    const parts = hasil?.candidates?.[0]?.content?.parts;
+    const deskripsi = Array.isArray(parts)
+      ? parts
+          .map((part) => (typeof part?.text === "string" ? part.text.trim() : ""))
+          .filter(Boolean)
+          .join(" ")
+          .trim()
+      : "";
 
     if (!deskripsi) {
       console.error("Gemini API mengembalikan respons tanpa teks deskripsi", {
