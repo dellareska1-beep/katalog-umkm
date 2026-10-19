@@ -64,3 +64,50 @@ export async function updateAdminPassword(formData) {
 
   redirect(`/admin/password?success=${encodeURIComponent("Password berhasil diubah.")}`);
 }
+
+export async function createProduct(formData) {
+  const nama = formData.get("nama")?.toString().trim() ?? "";
+  const hargaInput = formData.get("harga")?.toString().trim() ?? "";
+  const harga = Number(hargaInput);
+  const kategori = formData.get("kategori")?.toString().trim() || null;
+  const fotoUrl = formData.get("foto_url")?.toString().trim() || null;
+  const deskripsi = formData.get("deskripsi")?.toString().trim() || null;
+
+  if (!nama) {
+    redirect(
+      `/admin/produk/baru?error=${encodeURIComponent("Nama produk wajib diisi.")}`,
+    );
+  }
+
+  if (!hargaInput || !Number.isSafeInteger(harga) || harga < 0) {
+    redirect(
+      `/admin/produk/baru?error=${encodeURIComponent("Harga harus berupa bilangan bulat 0 atau lebih.")}`,
+    );
+  }
+
+  const supabase = await createServerAuthClient();
+  const { data, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !data.user) {
+    redirect(
+      `/admin/login?error=${encodeURIComponent("Sesi login tidak ditemukan. Silakan masuk kembali.")}`,
+    );
+  }
+
+  const { error } = await supabase.from("produk").insert({
+    nama,
+    harga,
+    deskripsi,
+    foto_url: fotoUrl,
+    kategori,
+  });
+
+  if (error) {
+    console.error("Gagal menambahkan produk:", error);
+    redirect(
+      `/admin/produk/baru?error=${encodeURIComponent("Produk gagal disimpan. Periksa data lalu coba lagi.")}`,
+    );
+  }
+
+  redirect(`/admin?success=${encodeURIComponent("Produk berhasil ditambahkan.")}`);
+}

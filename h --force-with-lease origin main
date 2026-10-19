@@ -1,0 +1,11 @@
+* [33md1d6979[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m US-07: List produk di halaman admin dari database
+[31m|[m * [33meff2720[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m US-06: proteksi halaman admin
+[31m|[m[31m/[m  
+* [33m2c82580[m US-06: proteksi halaman admin
+* [33mce55b5e[m US-04: login admin
+* [33m1bc0ae1[m US-03: tombol pesan WhatsApp
+* [33m484dc35[m US-02: detail produk dari database
+* [33mc351773[m US-01: katalog dari database
+* [33ma0abaee[m Kustomisasi identitas toko
+* [33mcc77f53[m Initial commit
+* [33m8d7867f[m Agent host session aa2e0c61-3407-4744-b96b-72ab6edf1fba - turn 8
