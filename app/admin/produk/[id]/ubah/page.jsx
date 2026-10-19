@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import NavAdmin from "@/components/NavAdmin";
 import FormProduk from "@/components/FormProduk";
-import { updateProduct } from "@/app/admin/actions";
+import { generateProductDescription, updateProduct } from "@/app/admin/actions";
 import { createServerAuthClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +33,12 @@ export default async function HalamanUbahProduk({ params, searchParams }) {
           {query.error}
         </p>
       ) : null}
-      <FormProduk produk={produk} labelTombol="Simpan perubahan" action={updateProduct} />
+      <FormProduk
+        produk={produk}
+        labelTombol="Simpan perubahan"
+        action={updateProduct}
+        generateDescription={generateProductDescription}
+      />
     </div>
   );
 }

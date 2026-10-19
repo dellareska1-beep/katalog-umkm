@@ -1,6 +1,6 @@
 import NavAdmin from "@/components/NavAdmin";
 import FormProduk from "@/components/FormProduk";
-import { createProduct } from "@/app/admin/actions";
+import { createProduct, generateProductDescription } from "@/app/admin/actions";
 
 export default async function HalamanTambahProduk({ searchParams }) {
   const params = await searchParams;
@@ -15,7 +15,11 @@ export default async function HalamanTambahProduk({ searchParams }) {
           {pesanError}
         </p>
       ) : null}
-      <FormProduk labelTombol="Simpan produk" action={createProduct} />
+      <FormProduk
+        labelTombol="Simpan produk"
+        action={createProduct}
+        generateDescription={generateProductDescription}
+      />
     </div>
   );
 }
