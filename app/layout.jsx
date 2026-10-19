@@ -6,12 +6,26 @@ import { toko } from "@/lib/toko";
 export const metadata = {
   title: toko.nama,
   description: toko.tagline,
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icons/icon-512.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" }],
+  },
+  appleWebApp: {
+    capable: true,
+    title: toko.nama,
+    statusBarStyle: "default",
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="id">
       <head>
+        <meta name="theme-color" content="#1f6b4f" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
