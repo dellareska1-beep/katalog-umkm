@@ -28,3 +28,39 @@ export async function logoutAdmin() {
   await supabase.auth.signOut();
   redirect("/admin/login");
 }
+
+export async function updateAdminPassword(formData) {
+  const password = formData.get("password_baru")?.toString() ?? "";
+  const confirmation = formData.get("konfirmasi_password")?.toString() ?? "";
+
+  if (password.length < 8) {
+    redirect(
+      `/admin/password?error=${encodeURIComponent("Password baru harus terdiri dari minimal 8 karakter.")}`,
+    );
+  }
+
+  if (password !== confirmation) {
+    redirect(
+      `/admin/password?error=${encodeURIComponent("Konfirmasi password harus sama dengan password baru.")}`,
+    );
+  }
+
+  const supabase = await createServerAuthClient();
+  const { data, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !data.user) {
+    redirect(
+      `/admin/login?error=${encodeURIComponent("Sesi login tidak ditemukan. Silakan masuk kembali.")}`,
+    );
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    redirect(
+      `/admin/password?error=${encodeURIComponent("Password gagal diubah. Silakan coba lagi.")}`,
+    );
+  }
+
+  redirect(`/admin/password?success=${encodeURIComponent("Password berhasil diubah.")}`);
+}
